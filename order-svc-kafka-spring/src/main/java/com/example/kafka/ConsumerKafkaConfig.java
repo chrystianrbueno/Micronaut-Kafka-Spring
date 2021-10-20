@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -19,6 +18,7 @@ public class ConsumerKafkaConfig {
 
     @Bean
     public ConsumerFactory<String, Shipment> shipmentConsumerFactory(){
+
         Map<String, Object> props = new HashMap<>();
 
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -27,13 +27,16 @@ public class ConsumerKafkaConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(Shipment.class, false));
+
     }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Shipment> shipmentConcurrentKafkaListenerContainerFactory(){
+
         ConcurrentKafkaListenerContainerFactory<String, Shipment> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(shipmentConsumerFactory());
         return factory;
+
     }
 
 }
