@@ -27,14 +27,26 @@ public class OrderService {
         return orders;
     }
 
+    public Order getOrderById(Long id) {
+        return orders.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    public void updateOrder(Order order) {
+        log.info("Existing order update received");
+        Order existingOrder = getOrderById(order.getId());
+        int i = orders.indexOf(existingOrder);
+        orders.set(i, order);
+        log.info("Order with ID {} has been updated", order.getId());
+    }
+
     public Order newOrder(Order order){
         log.info("New order received");
         order.setId((long) orders.size());
         this.orders.add(order);
         var response = kafkaTemplate.send("order-topic",order);
         response.addCallback(
-                success -> log.info("[Order-Topic] - Envio com sucesso no order de id -> {}", order.getId()),
-                failure -> log.error("[Order-Topic] - Ocorreu um erro no order de id -> {}", order.getId())
+                success -> log.info("[Order-Topic - newOrder] - Envio com sucesso no order de id -> {}", order.getId()),
+                failure -> log.error("[Order-Topic - newOrder] - Ocorreu um erro no order de id -> {}", order.getId())
         );
         return order;
     }

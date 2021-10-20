@@ -28,8 +28,6 @@
             return orderFlowable.doOnSuccess(order ->{
                 log.info("Order {} received", order.getId());
                 log.info("Creating shipment for order {}....", order.getId());
-//                /* shipping is slow! */
-//                Thread.sleep(15*1000);
                 Shipment shipment = shippingService.newShipment(order);
                 log.info("Shipped order {} with shipment ID {}...", order.getId(), shipment.getId());
             });

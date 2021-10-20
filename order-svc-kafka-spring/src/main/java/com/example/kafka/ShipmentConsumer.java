@@ -1,17 +1,31 @@
 package com.example.kafka;
 
 import com.example.domain.Shipment;
+import com.example.domain.ShipmentStatus;
+import com.example.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @Slf4j
 public class ShipmentConsumer {
 
-    @KafkaListener(topics = "shipping-topic", groupId = "group_id")
+    private final OrderService orderService;
+
+    public ShipmentConsumer(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @KafkaListener(topics = "shipping-topic", groupId = "shipping-svc-kafka", containerFactory = "shipmentConcurrentKafkaListenerContainerFactory")
     public void consume(@Payload Shipment shipment){
-        log.info("Shippment return -> {}", shipment);
+        log.info("Shipment return -> {}", shipment);
+        var order = orderService.getOrderById(shipment.getOrderId());
+        order.setShipmentStatus(ShipmentStatus.SHIPPED);
+        orderService.updateOrder(order);
+        log.info("Order shipment status updated");
     }
 }

@@ -5,14 +5,15 @@ import com.example.domain.Shipment;
 //import com.example.messaging.ShipmentProducer;
 import com.example.messaging.ShipmentProducer;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @Singleton
+@Slf4j
 public class ShippingService {
-    private static final Logger LOG = LoggerFactory.getLogger(ShippingService.class);
 
     private final List<Shipment> shipments = Collections.synchronizedList(new ArrayList<>());
     private final ShipmentProducer shipmentProducer;
@@ -42,14 +43,18 @@ public class ShippingService {
     }
 
     public Shipment newShipment(Order order) {
-        Shipment shipment = new Shipment((long) shipments.size(), order.getId(), new Date());
+        var shipment = Shipment.builder()
+                                    .id((long) shipments.size())
+                                    .orderId(order.getId())
+                                    .shippedOn(new Date())
+                                    .build();
         synchronized (shipments) {
             shipments.add(shipment);
         }
-        LOG.info("Shipment created!");
-        LOG.info("Sending shipment message...");
+        log.info("Shipment created!");
+        log.info("Sending shipment message...");
         shipmentProducer.sendMessage(shipment);
-        LOG.info("Shipment message sent!");
+        log.info("Shipment message sent!");
         return shipment;
     }
 }
