@@ -1,4 +1,4 @@
-package com.example.kafka;
+package com.example.kafka.config;
 
 import com.example.domain.Shipment;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class ConsumerKafkaConfig {
+public class ConsumerShipmentConfig {
 
     @Bean
     public ConsumerFactory<String, Shipment> shipmentConsumerFactory(){

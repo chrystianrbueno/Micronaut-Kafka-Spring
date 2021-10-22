@@ -1,4 +1,4 @@
-package com.example.kafka;
+package com.example.kafka.config;
 
 import com.example.domain.Order;
 import org.apache.kafka.clients.producer.ProducerConfig;
