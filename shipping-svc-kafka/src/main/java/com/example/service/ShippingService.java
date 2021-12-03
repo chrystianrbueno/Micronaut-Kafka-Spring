@@ -5,40 +5,39 @@ import com.example.domain.Shipment;
 //import com.example.messaging.ShipmentProducer;
 import com.example.messaging.ShipmentProducer;
 import jakarta.inject.Singleton;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @Singleton
 @Slf4j
+@RequiredArgsConstructor
 public class ShippingService {
 
+    @Getter
     private final List<Shipment> shipments = Collections.synchronizedList(new ArrayList<>());
+
     private final ShipmentProducer shipmentProducer;
 
-    public ShippingService(ShipmentProducer shipmentProducer) {
-        this.shipmentProducer = shipmentProducer;
-    }
-
     public Shipment getShipmentById(Long id) {
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Finding shipment by id -> {}!", id);
         Shipment shipment;
         synchronized (shipments) {
             shipment = shipments.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
         }
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Returning shipment -> {}!", shipment);
         return shipment;
     }
 
-    public List<Shipment> listShipments() {
-        return shipments;
-    }
-
     public void updateShipment(Shipment shipment) {
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Updating shipment -> {}!", shipment);
         Shipment existingShipment = getShipmentById(shipment.getId());
         synchronized (shipments) {
             int i = shipments.indexOf(existingShipment);
             shipments.set(i, shipment);
+            log.info("[SHIPMENT-SERVICE-MICRONAUT] - Shipment updated -> {}!", shipment);
         }
     }
 
@@ -48,13 +47,14 @@ public class ShippingService {
                                     .orderId(order.getId())
                                     .shippedOn(new Date())
                                     .build();
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Shipment created!");
         synchronized (shipments) {
             shipments.add(shipment);
         }
-        log.info("Shipment created!");
-        log.info("Sending shipment message...");
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Shipment added a list of Shipments!");
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Shipment message - Producing.... ");
         shipmentProducer.sendMessage(shipment);
-        log.info("Shipment message sent!");
+        log.info("[SHIPMENT-SERVICE-MICRONAUT] - Shipment message sent!");
         return shipment;
     }
 }

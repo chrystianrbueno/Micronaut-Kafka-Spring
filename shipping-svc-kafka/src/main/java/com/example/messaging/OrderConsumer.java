@@ -26,10 +26,12 @@
         @Topic("order-topic")
         public Single<Order> receive(@MessageBody Single<Order> orderFlowable){
             return orderFlowable.doOnSuccess(order ->{
-                log.info("Order {} received", order.getId());
-                log.info("Creating shipment for order {}....", order.getId());
+                log.info("[ORDER-CONSUMER-MICRONAUT] - Order received", order.getId());
+                log.info("[ORDER-CONSUMER-MICRONAUT] - Creating shipment for order {}....", order);
+                /* shipping is slow! */
+                Thread.sleep(15*1000);
                 Shipment shipment = shippingService.newShipment(order);
-                log.info("Shipped order {} with shipment ID {}...", order.getId(), shipment.getId());
+                log.info("[ORDER-CONSUMER-MICRONAUT] - Shipped order ID {} with shipment ID {}...", order.getId(), shipment.getId());
             });
         }
 }

@@ -14,4 +14,3 @@ public class Shipment {
     private Date shippedOn;
 
 }
-

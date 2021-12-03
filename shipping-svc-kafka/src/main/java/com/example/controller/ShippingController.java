@@ -20,7 +20,7 @@ public class ShippingController {
     @Get("/shipments/recent/{count}")
     public HttpResponse<List<Shipment>> getRecentShipments(Long count) {
         return HttpResponse.ok(
-                shippingService.listShipments().stream().limit(count).collect(Collectors.toList())
+            shippingService.getShipments().stream().limit(count).collect(Collectors.toList())
         );
     }
 }
